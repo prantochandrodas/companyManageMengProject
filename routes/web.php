@@ -43,7 +43,7 @@ Route::delete('/funds/{id}', [NewFundController::class, 'destroy'])->name('funds
 // OFFICE EXPENSE 
 Route::get('/getOfficeExpense', [OfficeExpenseController::class, 'getFunds'])->name('officeExpense.get');
 Route::get('/officeExpense/create',[OfficeExpenseController::class,'create'])->name('officeExpense.create');
-Route::post('/office_expenses', [OfficeExpenseController::class, 'store']);
+Route::post('/office_expenses', [OfficeExpenseController::class, 'store'])->name('officeExpense.store');
 Route::delete('/officeExpense/{id}', [OfficeExpenseController::class, 'destroy'])->name('officeExpense.destroy');
 Route::get('/officeExpense', [OfficeExpenseController::class, 'index'])->name('officeExpense.index');
 

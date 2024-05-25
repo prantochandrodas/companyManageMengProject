@@ -17,7 +17,7 @@ class OfficeExpenseController extends Controller
         return view('OfficeExpense.index');
     }
 
-  
+
     public function getExpenseHeads($expense_category_id)
     {
         $expenseHeads = ExpenseHead::where('expense_category_id', $expense_category_id)->get();
@@ -27,7 +27,7 @@ class OfficeExpenseController extends Controller
         return response()->json($expenseHeads);
     }
 
-   
+
 
     public function create()
     {
@@ -90,27 +90,43 @@ class OfficeExpenseController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request);
-        try {
-            DB::beginTransaction();
-            $fundCategory = FundCategory::find($request->fund_category);
-            if ($fundCategory->total >= $request->amount) {
-                OfficeExpense::create($request->all());
-                $newTotalAmount = $fundCategory->total - $request->amount;
-                $newAddedAmount = $fundCategory->expensedAmount + $request->amount;
-                $fundCategory->update([
-                    'total' => $newTotalAmount,
-                    'expensedAmount'=>$newAddedAmount
+        // Handle form submission and store data
+        // Iterate through each input field and save to the database
+        foreach ($request->input('expense_category') as $key => $value) {
+            // Process each entry in the request
+            foreach ($request->input('expense_category') as $key => $category) {
+                OfficeExpense::create([
+                    'expense_category' => $category,
+                    'expense_head_category' => $request->input('expense_head_category')[$key],
+                    'fund_category' => $request->input('fund_category')[$key],
+                    'amount' => $request->input('amount')[$key],
+                    'description' => $request->input('description')[$key],
                 ]);
-                DB::commit();
-                return redirect()->route('officeExpense.index')->with('success', 'Expense added sucessfully');
-            } else {
-                DB::commit();
-                return redirect()->route('officeExpense.index')->with('error', 'Not have enough');
             }
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $e->getMessage();
+
+            return redirect()->route('officeExpense.index')->with('success', 'Expense added sucessfully');
         }
+        // dd($request->all());
+        // try {
+        //     DB::beginTransaction();
+        //     $fundCategory = FundCategory::find($request->fund_category);
+        //     if ($fundCategory->total >= $request->amount) {
+        //         OfficeExpense::create($request->all());
+        //         $newTotalAmount = $fundCategory->total - $request->amount;
+        //         $newAddedAmount = $fundCategory->expensedAmount + $request->amount;
+        //         $fundCategory->update([
+        //             'total' => $newTotalAmount,
+        //             'expensedAmount'=>$newAddedAmount
+        //         ]);
+        //         DB::commit();
+        //         return redirect()->route('officeExpense.index')->with('success', 'Expense added sucessfully');
+        //     } else {
+        //         DB::commit();
+        //         return redirect()->route('officeExpense.index')->with('error', 'Not have enough');
+        //     }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return $e->getMessage();
+        // }
     }
 }
