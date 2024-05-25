@@ -9,6 +9,7 @@
     <title>Expense Heads</title>
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
 </head>
 
 <body style="font-family: Arial, sans-serif;">
@@ -32,40 +33,40 @@
             <div class="col-md-4">
                 <label for="expense_category" class="form-label h5">Expense Category</label>
                 <select class="form-select rounded-0" id="expense_category" name="expense_category">
-                    <option value="">Select Fund</option>
+                    <option value="">All expense category</option>
                     <!-- Add options dynamically if needed -->
                     @foreach ($expenseCategories as $category)
-                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    <option value="{{ $category->id }}" {{ request('expense_category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                     @endforeach
                 </select>
             </div>
+
             <div class="col-md-4">
-                <label for="expenseHeads" class="form-label h5">Expense Category</label>
-                <select class="form-select rounded-0" id="expenseHeads" name="expenseHeads">
-                    <option value="">Select Fund</option>
-                    <!-- Add options dynamically if needed -->
-                    @foreach ($expenseHeads as $category)
-                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                    @endforeach
-                </select>
+                <div style="margin-bottom: 20px;">
+                    <label for="expense_head_category" style="display: block; margin-bottom: 5px;">Expense Head:</label>
+                    <select name="expense_head_category" id="expense_head_category" class="form-control" style="width: 100%; padding: 8px;" name="expense_category">
+                        <option value="">All Head</option>
+                    </select>
+                </div>
             </div>
+
             <div class="col-md-4">
                 <label for="fund" class="form-label h5">Fund</label>
                 <select class="form-select rounded-0" id="fund_category" name="fund_category">
-                    <option value="">Select Fund</option>
+                    <option value="">All Fund</option>
                     <!-- Add options dynamically if needed -->
                     @foreach ($fundCategories as $category)
-                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    <option value="{{ $category->id }}" {{ request('fund_category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="col-md-4">
                 <label for="fromdate" class="form-label h5">From Date</label>
-                <input type="date" class="form-control rounded-0" id="fromdate" name="fromdate">
+                <input type="date"  class="form-control rounded-0" id="fromdate" name="fromdate" value="{{ request('fromdate') }}">
             </div>
             <div class="col-md-4">
                 <label for="todate" class="form-label h5">To Date</label>
-                <input type="date" class="form-control rounded-0" id="todate" name="todate">
+                <input type="date" class="form-control rounded-0" id="todate" name="todate" value="{{ request('todate') }}">
             </div>
             <div class="col-md-4 d-flex align-items-end">
                 <button type="submit" id="filterButton" class="btn btn-primary">Filter</button>
@@ -74,7 +75,7 @@
     </div>
     @if(isset($expenses))
     @if($expenses->isEmpty())
-    <p>No records found</p>
+        <p>No records found</p>
     @else
 
 
@@ -136,7 +137,38 @@
     </table> -->
     @endif
     @endif
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function loadExpenseHeads() {
+                const expenseCategoryId = $('#expense_category').val();
+                if (expenseCategoryId) {
+                    $.ajax({
+                        url: '{{ route("/report.getExpenseHeads") }}',
+                        type: 'GET',
+                        data: { expense_category_id: expenseCategoryId },
+                        success: function(data) {
+                            let options = '<option value="">Select Head</option>';
+                            data.forEach(function(head) {
+                                options += `<option value="${head.id}" ${head.id == '{{ request("expense_head_category") }}' ? 'selected' : ''}>${head.name}</option>`;
+                            });
+                            $('#expense_head_category').html(options);
+                        }
+                    });
+                } else {
+                    $('#expense_head_category').html('<option value="">Select Head</option>');
+                }
+            }
+
+            $('#expense_category').change(loadExpenseHeads);
+
+            @if(request('expense_category'))
+                loadExpenseHeads();
+            @endif
+        });
+    </script>
     @endsection
+
 </body>
 
 </html>

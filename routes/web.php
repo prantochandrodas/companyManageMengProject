@@ -2,13 +2,10 @@
 
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseHeadController;
+use App\Http\Controllers\ExpenseReportController;
 use App\Http\Controllers\FundCategoryController;
-use App\Http\Controllers\FundController;
 use App\Http\Controllers\NewFundController;
 use App\Http\Controllers\OfficeExpenseController;
-use App\Models\FundCategory;
-use App\Models\OfficeExpense;
-use GuzzleHttp\Promise\Create;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -53,8 +50,8 @@ Route::get('/officeExpense', [OfficeExpenseController::class, 'index'])->name('o
 
 // Route::get('/report',[OfficeExpenseController::class,'reportPageView'])->name('report.filter');
 // Route::get('/expense/report/filter',[OfficeExpenseController::class,'filter'])->name('report.filter');
-Route::get('/report/page', [OfficeExpenseController::class, 'report'])->name('report.page');
-Route::get('/report', [OfficeExpenseController::class, 'filter'])->name('report.filter');
+Route::get('/report/page', [ExpenseReportController::class, 'report'])->name('report.page');
+Route::get('/report', [ExpenseReportController::class, 'filter'])->name('report.filter');
+Route::get('/report/getExpenseHeads', [ExpenseReportController::class, 'getExpenseHeads'])->name('/report.getExpenseHeads');
 
-
-Route::get('/officeExpense/{expense_category_id}/heads', [OfficeExpenseController::class, 'getExpenseHeads']);
+Route::get('/officeExpense/{expense_category_id}', [OfficeExpenseController::class, 'getExpenseHeads']);

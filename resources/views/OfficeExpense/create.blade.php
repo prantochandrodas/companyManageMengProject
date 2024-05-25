@@ -34,7 +34,7 @@
             </div>
             <div style="margin-bottom: 20px;">
                 <label for="expense_head_category" style="display: block; margin-bottom: 5px;">Expense Head:</label>
-                <select name="expense_head_category" id="expense_head_category" class="form-control" style="width: 100%; padding: 8px;" name="expense_category" required>
+                <select name="expense_head_category" id="expense_head_category" class="form-control" style="width: 100%; padding: 8px;" required>
                     <option value="">Select Head</option>
                 </select>
             </div>

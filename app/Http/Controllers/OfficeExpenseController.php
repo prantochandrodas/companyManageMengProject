@@ -17,15 +17,7 @@ class OfficeExpenseController extends Controller
         return view('OfficeExpense.index');
     }
 
-    public function report(Request $request)
-    {
-        $fundCategories = FundCategory::all();
-        $expenseCategories = Expence::all();
-        $expenseHeads=ExpenseHead::all();
-        $expenses = null;
-        return view('ExpenseReport.index', compact('fundCategories', 'expenses','expenseCategories','expenseHeads'));
-    }
-
+  
     public function getExpenseHeads($expense_category_id)
     {
         $expenseHeads = ExpenseHead::where('expense_category_id', $expense_category_id)->get();
@@ -35,48 +27,7 @@ class OfficeExpenseController extends Controller
         return response()->json($expenseHeads);
     }
 
-    public function filter(Request $request)
-    {
-        //  dd($request);
-        $request->validate([
-            'expense_category' => 'required|exists:expences,id',
-            'expenseHeads' => 'required|exists:expense_heads,id',
-            'fund_category' => 'required|exists:fund_categories,id',
-            'fromdate' => 'required|date',
-            'todate' => 'required|date'
-        ]);
-
-         // Build the query
-         $query = OfficeExpense::query();
-        
-        if($request->has('fromdate') && $request->has('todate')){
-            $query->whereBetween('created_at', [$request->fromdate, $request->todate]);
-        }
-
-        
-        // Apply expense head category filter
-        if ($request->filled('expense_heads')) {
-            $query->where('expense_heads', $request->expenseHeads);
-        }
-
-
-         // Apply fund category filter
-         if ($request->filled('fund_category')) {
-            $query->where('fund_category', $request->fund_category);
-        }
-
-        // Execute the query and get the results
-        $expenses = $query->get();
-
-        // $expenses = OfficeExpense::where('fund_category', $fundCategoryId)
-        //     ->whereDate('created_at', $date)
-        //     ->get();
-        $fundCategories = FundCategory::all();
-        $expenseCategories = Expence::all();
-        $expenseHeads = ExpenseHead::all();
-        return view('ExpenseReport.index', compact('fundCategories', 'expenses', 'expenseCategories', 'expenseHeads'));
-    }
-
+   
 
     public function create()
     {

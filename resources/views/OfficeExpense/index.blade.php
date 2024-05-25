@@ -37,7 +37,7 @@
                 <th>Used Fund</th>
                 <th>Description</th>
                 <th>Amount</th>
-                <th>Action</th>
+                <!-- <th>Action</th> -->
             </tr>
         </thead>
     </table>
@@ -58,7 +58,7 @@
                     {data: 'fund_category', name: 'fund_category'},
                     {data: 'description', name: 'description'},
                     {data: 'amount', name: 'amount'},
-                    { data: 'action', name: 'action', orderable: false, searchable: false }
+                    // { data: 'action', name: 'action', orderable: false, searchable: false }
                 ]
             });
         });

@@ -37,7 +37,7 @@
                 <th>Description</th>
                 <th>Fund</th>
                 <th>Amount</th>
-                <th>Action</th>
+                <!-- <th>Action</th> -->
             </tr>
         </thead>
     </table>
@@ -62,7 +62,7 @@
                         data: 'amount',
                         name: 'amount'
                     },
-                    { data: 'action', name: 'action', orderable: false, searchable: false }
+                    // { data: 'action', name: 'action', orderable: false, searchable: false }
                 ]
             });
         });
