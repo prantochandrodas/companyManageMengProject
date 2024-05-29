@@ -28,12 +28,13 @@
         {{ session('error') }}
     </div>
     @endif
-    <a href="{{route('incomeCategory.create')}}"><button type="button" class="btn btn-primary my-4">Add</button></a>
+    <a href="{{route('incomeHead.create')}}"><button type="button" class="btn btn-primary my-4">Add</button></a>
     <table id="mydata" class="display" style="width:100%">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Income Category</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -45,7 +46,7 @@
             $('#mydata').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route("incomeCategory.getIncomeCategory") }}',
+                ajax: '{{ route("incomeHead.getIncomeHead") }}',
                 columns: [
                     {
                         data: null, // Use null to signify that this column does not map directly to any data source
@@ -59,6 +60,10 @@
                     {
                         data: 'name',
                         name: 'name'
+                    },
+                    {
+                        data: 'income_category',
+                        name: 'income_category'
                     },
                     {
                         data: 'action',

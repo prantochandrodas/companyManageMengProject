@@ -4,8 +4,12 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ExpenseHeadController;
 use App\Http\Controllers\ExpenseReportController;
 use App\Http\Controllers\FundCategoryController;
+use App\Http\Controllers\IncomeCategoryController;
+use App\Http\Controllers\IncomeController;
+use App\Http\Controllers\IncomeHeadController;
 use App\Http\Controllers\NewFundController;
 use App\Http\Controllers\OfficeExpenseController;
+use App\Models\IncomeHead;
 use App\Models\OfficeExpense;
 use Illuminate\Support\Facades\Route;
 
@@ -51,10 +55,32 @@ Route::get('/officeExpenseView/{officeExpense}',[OfficeExpenseController::class,
 Route::get('/office-expense/print/{id}', [OfficeExpenseController::class, 'print'])->name('officeExpense.print');
 Route::get('/office-expense/pdf/{id}', [OfficeExpenseController::class, 'pdf'])->name('officeExpense.pdf');
 
-// Route::get('/report',[OfficeExpenseController::class,'reportPageView'])->name('report.filter');
-// Route::get('/expense/report/filter',[OfficeExpenseController::class,'filter'])->name('report.filter');
+
+
 Route::get('/report/page', [ExpenseReportController::class, 'report'])->name('report.page');
 Route::get('/report', [ExpenseReportController::class, 'filter'])->name('report.filter');
 Route::get('/report/getExpenseHeads', [ExpenseReportController::class, 'getExpenseHeads'])->name('/report.getExpenseHeads');
-
 Route::get('/officeExpense/{expense_category_id}', [OfficeExpenseController::class, 'getExpenseHeads']);
+
+
+
+// income 
+Route::get('/incomeCategory',[IncomeCategoryController::class,'index'])->name('incomeCategory.index');
+Route::get('/incomeCategory/getIncomeCategory',[IncomeCategoryController::class,'getIncomeCategory'])->name('incomeCategory.getIncomeCategory');
+Route::get('/incomeCategory/create',[IncomeCategoryController::class,'create'])->name('incomeCategory.create');
+Route::post('/incomeCategory/store',[IncomeCategoryController::class,'store'])->name('incomeCategory.store');
+Route::delete('/incomeCategory/distroy/{id}',[IncomeCategoryController::class,'distroy'])->name('incomeCategory.distroy');
+
+
+Route::get('/incomeHead',[IncomeHeadController::class,'index'])->name('incomeHead.index');
+Route::get('/incomeHead/getIncomeHead',[IncomeHeadController::class,'getIncomeHead'])->name('incomeHead.getIncomeHead');
+Route::get('/incomeHead/create',[IncomeHeadController::class,'create'])->name('incomeHead.create');
+Route::post('/incomeHead/store',[IncomeHeadController::class,'store'])->name('incomeHead.store');
+Route::delete('/incomeHead/distroy/{id}',[IncomeHeadController::class,'distroy'])->name('incomeHead.distroy');
+
+
+Route::get('/income',[IncomeController::class,'index'])->name('income.index');
+Route::get('/income/getincome',[IncomeController::class,'getincome'])->name('income.getincome');
+Route::get('/income/create',[IncomeController::class,'create'])->name('income.create');
+Route::post('/income/store',[IncomeController::class,'store'])->name('income.store');
+Route::delete('/income/distroy/{id}',[IncomeController::class,'distroy'])->name('income.distroy');

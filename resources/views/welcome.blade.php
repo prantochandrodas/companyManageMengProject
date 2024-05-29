@@ -46,6 +46,12 @@
                         <li style="margin-bottom: 10px;">
                             <a href="{{ route('report.page') }}" style="text-decoration: none; color: black; display: block; padding: 10px; border-radius: 5px;">Expense Report</a>
                         </li>
+                        <li style="margin-bottom: 10px;">
+                            <a href="{{ route('incomeCategory.index') }}" style="text-decoration: none; color: black; display: block; padding: 10px; border-radius: 5px;">Income category</a>
+                        </li>
+                        <li style="margin-bottom: 10px;">
+                            <a href="{{ route('incomeHead.index') }}" style="text-decoration: none; color: black; display: block; padding: 10px; border-radius: 5px;">Income head</a>
+                        </li>
                         
                     </ul>
                 </div>

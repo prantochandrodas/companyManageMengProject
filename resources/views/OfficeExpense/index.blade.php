@@ -78,7 +78,8 @@
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route("officeExpense.get") }}',
-                columns: [{
+                columns: [
+                    {
                         data: null, // Use null to signify that this column does not map directly to any data source
                         name: 'serial_number',
                         render: function(data, type, row, meta) {
