@@ -59,22 +59,35 @@
                     },
                     {
                         data: 'openingAmount',
-                        name: 'openingAmount'
+                        name: 'openingAmount',
+                        render: function(data, type, row) {
+                            return parseInt(data, 10);
+                        }
                     },
                     {
-                        data: 'addedFundAmount',
-                        name: 'addedFundAmount'
+                        data: 'addedAmount',
+                        name: 'addedAmount',
+                        render: function(data, type, row) {
+                            return parseInt(data, 10);
+                        }
                     },
                     {
-                        data:'expensedAmount',
-                        name:'expensedAmount'
+                        data: 'expensedAmount',
+                        name: 'expensedAmount',
+                        render: function(data, type, row) {
+                            return parseInt(data, 10);
+                        }
                     },
                     {
-                        data:'total',
-                        name:'total'
+                        data: 'remainingAmount',
+                        name: 'remainingAmount',
+                        render: function(data, type, row) {
+                            return parseInt(data, 10);
+                        }
                     }
                 ]
             });
+
         });
     </script>
     @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Fund;
 use App\Models\FundCategory;
 use App\Models\NewFund;
+use App\Models\OfficeExpense;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -18,10 +19,31 @@ class FundCategoryController extends Controller
     public function getFundsCategory(Request $request)
     {
         if ($request->ajax()) {
-            $users = FundCategory::query();
-            return DataTables::of($users)->make(true);
+            $fundCategories = FundCategory::query();
+    
+            return DataTables::of($fundCategories)
+                ->addColumn('expensedAmount', function ($fundCategory) {
+                    $expensedAmount = OfficeExpense::where('fund_category', $fundCategory->id)->sum('amount');
+                    return $expensedAmount;
+                })
+                ->addColumn('addedAmount', function ($fundCategory) {
+                    $addedAmount = NewFund::where('category_id', $fundCategory->id)->sum('amount');
+                    return $addedAmount;
+                })
+                ->addColumn('remainingAmount', function ($fundCategory) {
+                    $expensedAmount = OfficeExpense::where('fund_category', $fundCategory->id)->sum('amount');
+                    $addedAmount = NewFund::where('category_id', $fundCategory->id)->sum('amount');
+                    $remainingAmount = $fundCategory->openingAmount + $addedAmount - $expensedAmount;
+                  
+                    return $remainingAmount;
+                })
+                ->make(true);
         }
-        return abort(404);
+        // if ($request->ajax()) {
+        //     $users = FundCategory::query();
+        //     return DataTables::of($users)->make(true);
+        // }
+        // return abort(404);
     }
 
 

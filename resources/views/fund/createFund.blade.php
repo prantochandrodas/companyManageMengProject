@@ -14,7 +14,7 @@
     @section('content')
     <div style="max-width: 600px; margin: 0 auto;">
         <div style="background-color: #f0f0f0; padding: 20px;">
-            <h2 style="text-align: center;">Add Fund</h2>
+            <h2 style="text-align: center;">Addjust Fund</h2>
         </div>
         <div style="background-color: #fff; padding: 20px; border: 1px solid #ccc;">
             <form method="POST" action="{{ route('create_fund.create') }}">

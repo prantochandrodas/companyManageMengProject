@@ -6,6 +6,7 @@ use App\Http\Controllers\ExpenseReportController;
 use App\Http\Controllers\FundCategoryController;
 use App\Http\Controllers\NewFundController;
 use App\Http\Controllers\OfficeExpenseController;
+use App\Models\OfficeExpense;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -44,9 +45,11 @@ Route::delete('/funds/{id}', [NewFundController::class, 'destroy'])->name('funds
 Route::get('/getOfficeExpense', [OfficeExpenseController::class, 'getFunds'])->name('officeExpense.get');
 Route::get('/officeExpense/create',[OfficeExpenseController::class,'create'])->name('officeExpense.create');
 Route::post('/office_expenses', [OfficeExpenseController::class, 'store'])->name('officeExpense.store');
-Route::delete('/officeExpense/{id}', [OfficeExpenseController::class, 'destroy'])->name('officeExpense.destroy');
+Route::delete('/officeExpense/{id}', [OfficeExpenseController::class, 'distroy'])->name('officeExpense.distroy');
 Route::get('/officeExpense', [OfficeExpenseController::class, 'index'])->name('officeExpense.index');
-
+Route::get('/officeExpenseView/{officeExpense}',[OfficeExpenseController::class,'view'])->name('officeExpense.view');
+Route::get('/office-expense/print/{id}', [OfficeExpenseController::class, 'print'])->name('officeExpense.print');
+Route::get('/office-expense/pdf/{id}', [OfficeExpenseController::class, 'pdf'])->name('officeExpense.pdf');
 
 // Route::get('/report',[OfficeExpenseController::class,'reportPageView'])->name('report.filter');
 // Route::get('/expense/report/filter',[OfficeExpenseController::class,'filter'])->name('report.filter');

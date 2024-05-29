@@ -21,8 +21,8 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-6 col-lg-3 bg-light sidebar h-100 min-vh-100">
-                <div class="sidebar-sticky">
+            <div class="col-md-6 col-lg-3 bg-light sidebar" style="height: 100vh; overflow-y: auto; position: sticky; top:0">
+                <div class="sticky-top">
 
                     <ul class="nav flex-column" style="list-style-type: none; padding: 0;">
                         <li style="margin-bottom: 10px;">

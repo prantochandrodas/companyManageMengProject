@@ -24,62 +24,63 @@
         @endif
 
         <form action="{{ route('officeExpense.store') }}" method="POST">
-    @csrf
-    <div id="expense-forms">
-        <div class="expense-form row">
-            <div class="col-4">
-                <div style="margin-bottom: 20px;">
-                    <label for="expense_category_0" style="display: block; margin-bottom: 5px;">Expense Category:</label>
-                    <select id="expense_category_0" class="form-control expense_category" style="width: 100%; padding: 8px;" name="expense_category[]" required>
-                        <option value="">Select a category</option>
-                        @foreach($expenseCategories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
+            @csrf
+            <div id="expense-forms">
+                <div class="expense-form">
+                    <div class="row">
+                        <div class="col-4">
+                            <div style="margin-bottom: 20px;">
+                                <label for="expense_category_0" style="display: block; margin-bottom: 5px;">Expense Category:</label>
+                                <select id="expense_category_0" class="form-control expense_category" style="width: 100%; padding: 8px;" name="expense_category[]" required>
+                                    <option value="">Select a category</option>
+                                    @foreach($expenseCategories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div style="margin-bottom: 20px;">
+                                <label for="expense_head_category_0" style="display: block; margin-bottom: 5px;">Expense Head:</label>
+                                <select name="expense_head_category[]" class="expense_head_category form-control" style="width: 100%; padding: 8px;" required>
+                                    <option value="">Select Head</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div style="margin-bottom: 20px;">
+                                <label for="fund_category_0" style="display: block; margin-bottom: 5px;">Fund Category:</label>
+                                <select id="fund_category_0" name="fund_category[]" class="form-control" style="width: 100%; padding: 8px;">
+                                    <option value="">Select fund</option>
+                                    @foreach ($fundCategories as $fundCategory)
+                                    <option value="{{ $fundCategory->id }}">{{ $fundCategory->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div style="margin-bottom: 20px;">
+                                <label for="amount_0" style="display: block; margin-bottom: 5px;">amount</label>
+                                <input type="number" name="amount[]" id="amount_0" style="width: 100%; padding: 8px;" required>
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div style="margin-bottom: 20px;">
+                                <label for="description_0" style="display: block; margin-bottom: 5px;">Description</label>
+                                <textarea name="description[]" id="description_0" style="width: 100%; padding: 8px;" required></textarea>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-4">
-                <div style="margin-bottom: 20px;">
-                    <label for="expense_head_category_0" style="display: block; margin-bottom: 5px;">Expense Head:</label>
-                    <select name="expense_head_category[]" class="expense_head_category form-control" style="width: 100%; padding: 8px;" required>
-                        <option value="">Select Head</option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-4">
-                <div style="margin-bottom: 20px;">
-                    <label for="fund_category_0" style="display: block; margin-bottom: 5px;">Fund Category:</label>
-                    <select id="fund_category_0" name="fund_category[]" class="form-control" style="width: 100%; padding: 8px;">
-                        <option value="">Select fund</option>
-                        @foreach ($fundCategories as $fundCategory)
-                        <option value="{{ $fundCategory->id }}">{{ $fundCategory->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="col-4">
-                <div style="margin-bottom: 20px;">
-                    <label for="amount_0" style="display: block; margin-bottom: 5px;">amount</label>
-                    <input type="number" name="amount[]" id="amount_0" style="width: 100%; padding: 8px;" required>
-                </div>
-            </div>
-            <div class="col-8">
-                <div style="margin-bottom: 20px;">
-                    <label for="description_0" style="display: block; margin-bottom: 5px;">Description</label>
-                    <textarea name="description[]" id="description_0" style="width: 100%; padding: 8px;" required></textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-    <button class="btn btn-primary" id="add-more">Add More</button>
-    <button type="submit" class="btn btn-success">Create</button>
-</form>
+            <button class="btn btn-primary" id="add-more">Add More</button>
+            <button type="submit" class="btn btn-success">Create</button>
+        </form>
     </div>
 
     <script>
         $(document).ready(function() {
             let expenseIndex = 1;
-
             $('#add-more').click(function() {
                 let expenseForm = $('.expense-form:first').clone();
                 expenseForm.find('input, select,textarea').each(function() {
@@ -89,16 +90,16 @@
                     $(this).val('');
                 });
 
-                // Check if remove button already exists before appending
-                if (!expenseForm.find('.remove-expense-form').length) {
-                    let removeButton = $('<button type="button" class="btn d-flex justify-content-center items-center col-1 mb-2 ml-3 btn-danger remove-expense-form" style="height:40px">X</button>');
-                    removeButton.prependTo(expenseForm);
-                }
-
                 // Insert the cloned form after the last filled form
                 $('.expense-form:last').after(expenseForm);
+
+                // Append the remove button before the first element of the cloned form
+                let removeButton = $('<button type="button" class="btn justify-content-center items-center col-1 mb-2 btn-secondary remove-expense-form" style="height:40px;">X</button>');
+                expenseForm.prepend(removeButton);
+
                 expenseIndex++;
             });
+
 
             $(document).on('click', '.remove-expense-form', function() {
                 $(this).closest('.expense-form').remove();

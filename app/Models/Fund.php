@@ -15,4 +15,16 @@ class Fund extends Model
     {
         return $this->belongsTo(FundCategory::class,'category_id','id');
     }
+
+    public function expenses()
+    {
+        return $this->hasMany(OfficeExpense::class,'fund_category ');
+    }
+
+    public function fundAddjusment()
+    {
+        return $this->hasMany(NewFund::class,'category_id');
+    }
+
+    
 }

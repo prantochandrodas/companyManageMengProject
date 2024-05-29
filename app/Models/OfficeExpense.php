@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class OfficeExpense extends Model
 {
     use HasFactory;
-    protected $fillable = ['expense_category', 'expense_head_category', 'fund_category', 'description','amount'];
+    protected $fillable = ['expense_category', 'expense_head_category', 'fund_category', 'description','amount','expense_master_id'];
    
     public function expenseCategory()
     {
@@ -25,4 +25,9 @@ class OfficeExpense extends Model
     {
         return $this->belongsTo(FundCategory::class, 'fund_category', 'id');
     }
+
+    public function expenseMaster(){
+        return $this->belongsTo(ExpenseMaster::class, 'expense_master_id', 'id');
+    }
+
 }
