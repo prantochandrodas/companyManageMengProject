@@ -46,23 +46,9 @@ class ExpenseHeadController extends Controller
 
     public function getExpenseHead(Request $request)
     {
-        // if ($request->ajax()) {
-        //     $data = ExpenseHead::with('category')->get();
-        //     return datatables()->of($data)
-        //     ->addColumn('action', function ($row) {
-
-        //         $btn = '<form action="' . route('expense_heads.destroy', $row->id) . '" method="POST" style="display:inline-block;">
-        //                     ' . csrf_field() . '
-        //                     ' . method_field('DELETE') . '
-        //                     <button type="submit" class="delete btn btn-danger btn-sm">Delete</button>
-        //                  </form>';
-        //         return $btn;
-        //     })
-        //     ->rawColumns(['action'])
-        //     ->make(true);
-        // }
+      
         if ($request->ajax()) {
-            $data = ExpenseHead::with('category')->get();
+            $data = ExpenseHead::with('category')->orderBy('created_at', 'desc')->get();
             return DataTables::of($data)
                 ->addColumn('category_name', function ($row) {
                     return $row->category ? $row->category->name : '';

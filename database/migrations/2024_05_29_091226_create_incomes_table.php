@@ -17,7 +17,11 @@ return new class extends Migration
             $table->foreign('income_category_id')->references('id')->on('income_categories');
             $table->unsignedBigInteger('income_head_id');
             $table->foreign('income_head_id')->references('id')->on('income_heads');
-            $table->boolean('amount',15,2);
+            $table->unsignedBigInteger('fund_category_id');
+            $table->foreign('fund_category_id')->references('id')->on('fund_categories');
+            $table->decimal('amount',15,2);
+            $table->string('email');
+            $table->string('phone_number', 15);
             $table->string('company_name');
             $table->text('description');
             $table->timestamps();

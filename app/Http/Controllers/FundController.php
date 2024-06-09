@@ -27,7 +27,7 @@ class FundController extends Controller
     public function getFunds(Request $request)
     {
         if ($request->ajax()) {
-            $data = Fund::with('category')->get();
+            $data = Fund::with('category')->orderBy('created_at', 'desc')->get();
             return DataTables::of($data)
                 ->addColumn('category_name', function ($row) {
                     return $row->category ? $row->category->name : '';

@@ -1,17 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Heads</title>
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-
-<body style="font-family: Arial, sans-serif;">
     @extends('welcome')
     @section('content')
     <!-- success message  -->
@@ -28,14 +15,16 @@
     </div>
     @endif
 
-    <a href="{{ route('officeExpense.create') }}"><button type="button" class="btn btn-primary my-4">Add</button></a>
+    <a href="{{ route('income.create') }}"><button type="button" class="btn btn-primary my-4">Add</button></a>
+    <a href="{{ route('income.import') }}"><button type="button" class="btn btn-primary my-4">Excel Import</button></a>
     <table id="mydata" class="display" style="width:100%">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Expense Category</th>
-                <th>Expense Head</th>
-                <th>Used Fund</th>
+                <th>SL.No</th>
+                <th>Income Category</th>
+                <th>Income Head</th>
+                <th>Fund</th>
+                <th>Name</th>
                 <th>Description</th>
                 <th>Amount</th>
                 <th>Date</th>
@@ -55,9 +44,13 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Expense Category:</strong> <span id="expenseCategory"></span></p>
-                    <p><strong>Expense Head:</strong> <span id="expenseHeadCategory"></span></p>
+                    <p><strong>Income Category:</strong> <span id="incomeCategory"></span></p>
+                    <p><strong>Income Head:</strong> <span id="incomeHeadCategory"></span></p>
                     <p><strong>Fund Category:</strong> <span id="fundCategory"></span></p>
+                    <p><strong>Name:</strong> <span id="name"></span></p>
+                    <p><strong>Company Name:</strong> <span id="companyName"></span></p>
+                    <p><strong>Email:</strong> <span id="email"></span></p>
+                    <p><strong>Phone Number:</strong> <span id="phone_number"></span></p>
                     <p><strong>Description:</strong> <span id="description"></span></p>
                     <p><strong>Amount:</strong> <span id="amount"></span></p>
                     <p><strong>Date:</strong> <span id="date"></span></p>
@@ -68,18 +61,13 @@
             </div>
         </div>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
             $('#mydata').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route("officeExpense.get") }}',
-                columns: [
-                    {
+                ajax: '{{ route("income.getincome") }}',
+                columns: [{
                         data: null, // Use null to signify that this column does not map directly to any data source
                         name: 'serial_number',
                         render: function(data, type, row, meta) {
@@ -89,20 +77,27 @@
                         searchable: false
                     },
                     {
-                        data: 'expense_category',
-                        name: 'expense_category'
+                        data: 'income_category',
+                        name: 'income_category'
                     },
                     {
-                        data: 'expenseHead_category',
-                        name: 'expenseHead_category'
+                        data: 'income_head',
+                        name: 'income_head'
                     },
                     {
                         data: 'fund_category',
                         name: 'fund_category'
                     },
                     {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
                         data: 'description',
-                        name: 'description'
+                        name: 'description',
+                        render: function(data, type, row) {
+                            return data ? $('<div/>').html(data).text() : ''; // This will display the HTML content correctly
+                        }
                     },
                     {
                         data: 'amount',
@@ -130,11 +125,12 @@
                 ]
             });
 
+
             // Handle the view button click
             $(document).on('click', '.view', function() {
                 var id = $(this).data('id');
                 $.ajax({
-                    url: '/officeExpenseView/' + id,
+                    url: '/income/view/' + id,
                     type: 'GET',
                     success: function(data) {
                         // console.log(data);
@@ -142,10 +138,14 @@
                             alert(data.error);
                         } else {
                             console.log(data);
-                            $('#expenseCategory').text(data.expenseCategory);
-                            $('#expenseHeadCategory').text(data.expenseHeadCategory);
-                            $('#fundCategory').text(data.fundCategory);
-                            $('#description').text(data.description);
+                            $('#incomeCategory').text(data.income_category_id);
+                            $('#incomeHeadCategory').text(data.income_head_id);
+                            $('#fundCategory').text(data.fund_category_id);
+                            $('#name').text(data.name);
+                            $('#companyName').text(data.company_name == null ? "No company name found" : data.company_name);
+                            $('#phone_number').text(data.phone_number);
+                            $('#email').text(data.email);
+                            $('#description').html(data.description);
                             $('#amount').text(data.amount);
                             $('#date').text(new Date(data.created_at).toLocaleDateString());
                             $('#viewModal').modal('show');
@@ -156,10 +156,10 @@
                     }
                 });
             });
-            
+
             $(document).on('click', '.print', function() {
                 var id = $(this).data('id');
-                var url = '/office-expense/print/' + id; // Replace with your actual print page URL
+                var url = '/income/print/' + id; // Replace with your actual print page URL
 
                 // Open the print page in a new window and trigger the print dialog
                 var printWindow = window.open(url, '_blank');
@@ -170,6 +170,3 @@
         });
     </script>
     @endsection
-</body>
-
-</html>

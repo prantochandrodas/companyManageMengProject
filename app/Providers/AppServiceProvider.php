@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Fund;
 use App\Observers\FundObserver;
 use Illuminate\Support\ServiceProvider;
+use Maatwebsite\Excel\ExcelServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,5 +24,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register the observer
         // Fund::observe(FundObserver::class);
+
+        $this->app->register(ExcelServiceProvider::class);
     }
 }

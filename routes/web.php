@@ -7,8 +7,10 @@ use App\Http\Controllers\FundCategoryController;
 use App\Http\Controllers\IncomeCategoryController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\IncomeHeadController;
+use App\Http\Controllers\LedgerController;
 use App\Http\Controllers\NewFundController;
 use App\Http\Controllers\OfficeExpenseController;
+use App\Http\Controllers\PermisionController;
 use App\Models\IncomeHead;
 use App\Models\OfficeExpense;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +60,7 @@ Route::get('/office-expense/pdf/{id}', [OfficeExpenseController::class, 'pdf'])-
 
 
 Route::get('/report/page', [ExpenseReportController::class, 'report'])->name('report.page');
+Route::get('/report/getReport', [ExpenseReportController::class, 'getReport'])->name('report.getReport');
 Route::get('/report', [ExpenseReportController::class, 'filter'])->name('report.filter');
 Route::get('/report/getExpenseHeads', [ExpenseReportController::class, 'getExpenseHeads'])->name('/report.getExpenseHeads');
 Route::get('/officeExpense/{expense_category_id}', [OfficeExpenseController::class, 'getExpenseHeads']);
@@ -81,6 +84,26 @@ Route::delete('/incomeHead/distroy/{id}',[IncomeHeadController::class,'distroy']
 
 Route::get('/income',[IncomeController::class,'index'])->name('income.index');
 Route::get('/income/getincome',[IncomeController::class,'getincome'])->name('income.getincome');
+Route::get('/income/incomeHead/{id}',[IncomeController::class,'getIncomeHeads'])->name('income.getIncomeHead');
 Route::get('/income/create',[IncomeController::class,'create'])->name('income.create');
 Route::post('/income/store',[IncomeController::class,'store'])->name('income.store');
 Route::delete('/income/distroy/{id}',[IncomeController::class,'distroy'])->name('income.distroy');
+Route::get('/income/pdf/{id}',[IncomeController::class,'pdf'])->name('income.pdf');
+Route::get('/income/print/{id}',[IncomeController::class,'print'])->name('income.print');
+Route::get('/income/view/{id}',[IncomeController::class,'view'])->name('income.view');
+Route::get('/income/report',[IncomeController::class,'report'])->name('income.report');
+Route::get('/income/filter',[IncomeController::class,'filter'])->name('income.filter');
+Route::get('/report/getIncomeHeads', [IncomeController::class, 'getIncomeHeads'])->name('/report.getIncomeHeads');
+Route::get('/income/import',[IncomeController::class,'import'])->name('income.import');
+Route::post('/income/StoreExcel',[IncomeController::class,'StoreExcel'])->name('income.StoreExcel');
+
+
+Route::get('/ledger/index',[LedgerController::class,'index'])->name('ledger.index');
+Route::get('/ledger/view', [LedgerController::class, 'view'])->name('ledger.view');
+Route::get('/ledger/pdf', [LedgerController::class, 'pdf'])->name('ledger.pdf');
+Route::get('/ledger/print', [LedgerController::class, 'print'])->name('ledger.print');
+
+Route::get('/ledger/export', [LedgerController::class, 'export'])->name('ledger.export');
+
+
+Route::resource('permisions',PermisionController::class);

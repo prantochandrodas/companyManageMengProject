@@ -121,6 +121,13 @@ class OfficeExpenseController extends Controller
             // dd($fundCategory->total);
             if ($fundCategory->total < $amounts[$key]) {
                 return redirect()->route('officeExpense.index')->with('error', 'Not enough funds in ' . $fundCategory->name);
+            }else{
+              $newTotal=  $fundCategory->total-$amounts[$key];
+              $newExpensedAmount=  $fundCategory->expensedAmount+$amounts[$key];
+                $fundCategory->update([
+                    'total' => $newTotal,
+                    'expensedAmount' =>$newExpensedAmount
+                ]);
             }
         }
 
@@ -136,6 +143,7 @@ class OfficeExpenseController extends Controller
             'amount' => $totalAmount,
         ]);
 
+        
         foreach ($request->input('expense_category') as $key => $category) {
             // dd($expenseMaster->id);
             OfficeExpense::create([
@@ -158,7 +166,7 @@ class OfficeExpenseController extends Controller
 
     public function pdf($id)
     {
-        $officeExpense = OfficeExpense::with('expenseCategory', 'expenseHeadCategory', 'fundCategory')->find($id);
+       $officeExpense = OfficeExpense::with('expenseCategory', 'expenseHeadCategory', 'fundCategory')->find($id);
         if (!$officeExpense) {
             return redirect()->route('officeExpense.index')->with('error', 'Expense not found');
         }

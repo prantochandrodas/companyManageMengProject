@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Carbon\Carbon;
 use App\Models\Expence;
 use App\Models\ExpenseHead;
 use App\Models\FundCategory;
@@ -10,14 +10,17 @@ use Illuminate\Http\Request;
 
 class ExpenseReportController extends Controller
 {
-    public function report(Request $request)
+    public function report()
     {
+        $query = OfficeExpense::query();
+        $query->whereDate('created_at', '>=', Carbon::today()->toDateString());
+        $expenses = $query->get();
         $fundCategories = FundCategory::all();
         $expenseCategories = Expence::all();
         $expenseHeads=ExpenseHead::all();
-        $expenses = null;
         return view('ExpenseReport.index', compact('fundCategories', 'expenses','expenseCategories','expenseHeads'));
     }
+    
 
 
     public function getExpenseHeads(Request $request)
@@ -25,6 +28,8 @@ class ExpenseReportController extends Controller
         $expenseHeads = ExpenseHead::where('expense_category_id', $request->expense_category_id)->get();
         return response()->json($expenseHeads);
     }
+
+    // ExpenseController.php
 
     public function filter(Request $request)
     {

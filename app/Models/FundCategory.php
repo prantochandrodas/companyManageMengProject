@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class FundCategory extends Model
 {
     use HasFactory;
-    protected $fillable = ['name','addedFundAmount','openingAmount','expensedAmount','total'];
+    protected $fillable = ['name','addedFundAmount','openingAmount','expensedAmount','incomeAmount','total'];
 
     public function cs()
     {
