@@ -14,14 +14,30 @@ class FundController extends Controller
 {
     public function createPage()
     {
-        $funds = FundCategory::all();
-        return view('fund.createFund', compact('funds'));
+        if (auth()->check()) {
+            if (auth()->user()->can('add-fund')) {
+                $funds = FundCategory::all();
+                return view('fund.createFund', compact('funds'));
+            } else {
+                return redirect('/')->with('error', 'You do not have permission to add fund.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function index()
     {
-        $funds = Fund::with('category')->get();
-        return view('fund.index', compact('funds'));
+        if (auth()->check()) {
+            if (auth()->user()->can('add-fund')) {
+                $funds = Fund::with('category')->get();
+                return view('fund.index', compact('funds'));
+            } else {
+                return redirect('/')->with('error', 'You do not have permission to view fund addjustment.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function getFunds(Request $request)
@@ -64,10 +80,18 @@ class FundController extends Controller
 
 
 
-    public function destroy($id)
-    {
-        $fund = Fund::find($id);
-        $fund->delete();
-        return redirect()->route('fund.index')->with('success', 'Expense head added sucessfully.');
-    }
+    // public function destroy($id)
+    // {
+    //     if (auth()->check()) {
+    //         if (auth()->user()->can('delete_posts')) {
+    //             $fund = Fund::find($id);
+    //             $fund->delete();
+    //             return redirect()->route('fund.index')->with('success', 'Expense head added sucessfully.');
+    //         } else {
+    //             return redirect('/')->with('error', 'You do not have permission to view fund addjustment.');
+    //         }
+    //     } else {
+    //         return redirect()->route('login')->with('error', 'You need to login first.');
+    //     }
+    // }
 }

@@ -15,7 +15,17 @@ class IncomeController extends Controller
 {
     public function index()
     {
-        return view('Income.index');
+        // ************** check permission *************
+        if (auth()->check()) {
+            if (auth()->user()->can('income')) {
+                return view('Income.index');
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to
+             Income.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function getIncomeHeads($id)
@@ -32,7 +42,18 @@ class IncomeController extends Controller
     {
         $incomeCategories = IncomeCategory::all();
         $fundCategories = FundCategory::all();
-        return view('Income.create', compact('incomeCategories', 'fundCategories'));
+
+        // ************** check permission *************
+        if (auth()->check()) {
+            if (auth()->user()->can('add_posts')) {
+                return view('Income.create', compact('incomeCategories', 'fundCategories'));
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to
+                add Income.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function store(Request $request)
@@ -112,7 +133,19 @@ class IncomeController extends Controller
                 'amount' => $income->amount,
                 'created_at' => $income->created_at
             ];
-            return response()->json($response);
+
+            // ************** check permission *************
+
+            if (auth()->check()) {
+                if (auth()->user()->can('income-view')) {
+                    return response()->json($response);
+                } else {
+                    return redirect()->back()->with('error', 'You do not have permission to
+                    Income view.');
+                }
+            } else {
+                return redirect()->route('login')->with('error', 'You need to login first.');
+            }
         } else {
             return response()->json(['error' => 'Expense not found'], 404);
         }
@@ -123,7 +156,18 @@ class IncomeController extends Controller
         $income = Income::with('incomeCategory', 'incomeHead', 'fundCategory')->find($id);
 
         if ($income) {
-            return view('Income.print', compact('income'));
+            // ************** check permission *************
+
+            if (auth()->check()) {
+                if (auth()->user()->can('income-print')) {
+                    return view('Income.print', compact('income'));
+                } else {
+                    return redirect()->back()->with('error', 'You do not have permission to
+                    Income print.');
+                }
+            } else {
+                return redirect()->route('login')->with('error', 'You need to login first.');
+            }
         } else {
             return view('Income.index', compact('error', 'income print error'));
         }
@@ -146,8 +190,21 @@ class IncomeController extends Controller
                 'amount' => $income->amount,
                 'created_at' => $income->created_at->format('Y-m-d')
             ];
-            $pdf =  \PDF::loadView('Income.pdf', $response);
-            return $pdf->download('Income_' . $id . '.pdf');
+
+            // ************** check permission *************
+            if (auth()->check()) {
+                if (auth()->user()->can('income-print')) {
+                    $pdf =  \PDF::loadView('Income.pdf', $response);
+                    return $pdf->download('Income_' . $id . '.pdf');
+                } else {
+                    return redirect()->back()->with('error', 'You do not have permission to
+                    Income pdf.');
+                }
+            } else {
+                return redirect()->route('login')->with('error', 'You need to login first.');
+            }
+
+
         } else {
             return response()->json(['error' => 'Income not found'], 404);
         }
@@ -155,12 +212,24 @@ class IncomeController extends Controller
 
     public function report()
     {
-        $incomeCategories = IncomeCategory::all();
-        $funds = FundCategory::all();
-        $query = Income::query();
-        $query->whereDate('created_at', '>=', Carbon::today()->toDateString());
-        $incomes = $query->orderBy('created_at', 'desc')->get();
-        return view('Income.report', compact('incomeCategories', 'funds', 'incomes'));
+        // dd('hi');
+        //  ||||||||||||||||||| check permission  \\\\\\\\\\\\\\\\\
+        if (auth()->check()) {        
+            if (auth()->user()->can('income-report')) {
+                // dd('hi');
+                $incomeCategories = IncomeCategory::all();
+                $funds = FundCategory::all();
+                $query = Income::query();
+                $query->whereDate('created_at', '>=', Carbon::today()->toDateString());
+                $incomes = $query->orderBy('created_at', 'desc')->get();
+        
+                return view('Income.report', compact('incomeCategories', 'funds', 'incomes'));
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to Income Report.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function filter(Request $request)
@@ -193,12 +262,37 @@ class IncomeController extends Controller
         $incomes = $query->get();
         $incomeCategories = IncomeCategory::all();
         $funds = FundCategory::all();
-        return view('Income.report', compact('incomes', 'incomeCategories', 'funds'))->with($request->all);
+
+        //  ************************** check permission **************************
+
+        if (auth()->check()) {
+            if (auth()->user()->can('income-report-filter')) {
+                return view('Income.report', compact('incomes', 'incomeCategories', 'funds'))->with($request->all);
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to
+                filter Income Report.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function import()
     {
-        return view('Income.excel');
+
+         //  ************************** check permission **************************
+
+         if (auth()->check()) {
+            if (auth()->user()->can('income-import-excel')) {
+                return view('Income.excel');
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to
+                Income excel.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
+        
     }
 
     public function StoreExcel(Request $request)
@@ -218,21 +312,19 @@ class IncomeController extends Controller
             foreach ($importedData as $data) {
                 $fundCategoryId = $data['fund_category_id'];
                 $amount = $data['amount'];
-    
+
                 $fundCategory = FundCategory::find($fundCategoryId);
-                
+
                 if (!$fundCategory) {
                     return redirect()->route('income.index')->with('error', 'Fund category not found for ID: ' . $fundCategoryId);
-                }else {
+                } else {
                     $fundCategory->total += $amount;
                     $fundCategory->incomeAmount += $amount;
-    
+
                     $fundCategory->save();
                 }
-
             }
-            return redirect()->route('income.index')->with('success', 'Data imported successfully!'); 
-            
+            return redirect()->route('income.index')->with('success', 'Data imported successfully!');
         } catch (\Exception $e) {
             \Log::error('Error during import:', ['exception' => $e]);
             return redirect()->back()->with('error', 'Error importing data: ' . $e->getMessage());

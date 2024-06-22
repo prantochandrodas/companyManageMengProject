@@ -34,7 +34,9 @@
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                @can('delete_posts')
                 <th>Action</th>
+                @endcan
             </tr>
         </thead>
     </table>
@@ -60,12 +62,14 @@
                         data: 'name',
                         name: 'name'
                     },
+                    @can('delete_posts')
                     {
                         data: 'action',
                         name: 'action',
                         orderable: false,
                         searchable: false
                     }
+                    @endcan
                 ]
             });
         });

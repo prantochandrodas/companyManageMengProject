@@ -15,8 +15,11 @@
     </div>
     @endif
 
+    
+    @can('add_posts')
     <a href="{{ route('income.create') }}"><button type="button" class="btn btn-primary my-4">Add</button></a>
     <a href="{{ route('income.import') }}"><button type="button" class="btn btn-primary my-4">Excel Import</button></a>
+    @endcan
     <table id="mydata" class="display" style="width:100%">
         <thead>
             <tr>
@@ -113,6 +116,7 @@
                             return new Date(data).toLocaleDateString();
                         }
                     },
+                    
                     {
                         data: 'action',
                         name: 'action',

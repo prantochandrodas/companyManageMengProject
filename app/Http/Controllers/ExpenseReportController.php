@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Carbon\Carbon;
 use App\Models\Expence;
 use App\Models\ExpenseHead;
@@ -17,10 +18,19 @@ class ExpenseReportController extends Controller
         $expenses = $query->get();
         $fundCategories = FundCategory::all();
         $expenseCategories = Expence::all();
-        $expenseHeads=ExpenseHead::all();
-        return view('ExpenseReport.index', compact('fundCategories', 'expenses','expenseCategories','expenseHeads'));
+        $expenseHeads = ExpenseHead::all();
+        if (auth()->check()) {
+            if (auth()->user()->can('expense-report')) {
+                return view('ExpenseReport.index', compact('fundCategories', 'expenses', 'expenseCategories', 'expenseHeads'));
+            } else {
+                return redirect('/')->with('error', 'You do not have permission to view fund addjustment.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
+       
     }
-    
+
 
 
     public function getExpenseHeads(Request $request)
@@ -64,5 +74,4 @@ class ExpenseReportController extends Controller
         return view('ExpenseReport.index', compact('expenses', 'expenseCategories', 'fundCategories'))
             ->with('filters', $request->all());
     }
-
 }

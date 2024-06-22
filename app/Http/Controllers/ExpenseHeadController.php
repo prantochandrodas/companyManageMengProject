@@ -13,8 +13,17 @@ class ExpenseHeadController extends Controller
 {
     public function index()
     {
+        if (auth()->check()) {
+            if (auth()->user()->can('expense-head')) {
+                return view('ExpenseHead.index');
+            } else {
+                return redirect('/')->with('error', 'You do not have permission to view fund addjustment.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
         // Fetch all expense heads with their corresponding expense category names
-        return view('ExpenseHead.index');
+
     }
 
 
@@ -32,6 +41,16 @@ class ExpenseHeadController extends Controller
 
     public function create()
     {
+
+        if (auth()->check()) {
+            if (auth()->user()->can('add-expenseHead')) {
+                return view('ExpenseHead.index');
+            } else {
+                return redirect('/')->with('error', 'You do not have permission to view fund addjustment.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
         $expenses = Expence::all();
         return view('ExpenseHead.expenseHeadCreate', compact('expenses'));
     }
@@ -41,12 +60,22 @@ class ExpenseHeadController extends Controller
     {
         $expense = ExpenseHead::find($id);
         $expense->delete();
-        return redirect()->route('expenseshead.index')->with('success', 'Expenses Deleted Sucessfull.');
+
+
+        if (auth()->check()) {
+            if (auth()->user()->can('delete_posts')) {
+                return redirect()->route('expenseshead.index')->with('success', 'Expenses Deleted Sucessfull.');
+            } else {
+                return redirect('/')->with('error', 'You do not have permission to view fund addjustment.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function getExpenseHead(Request $request)
     {
-      
+
         if ($request->ajax()) {
             $data = ExpenseHead::with('category')->orderBy('created_at', 'desc')->get();
             return DataTables::of($data)

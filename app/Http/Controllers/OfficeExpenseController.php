@@ -7,16 +7,33 @@ use App\Models\ExpenseHead;
 use App\Models\ExpenseMaster;
 use App\Models\FundCategory;
 use App\Models\OfficeExpense;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class OfficeExpenseController extends Controller
 {
-    public function index()
+
+    public function indexPage()
     {
-        return view('OfficeExpense.index');
+        if (auth()->check()) {
+            if (auth()->user()->can('expense')) {
+                $expenseCategories = Expence::all();
+                $expenseHeads = ExpenseHead::all();
+                $fundCategories = FundCategory::all();
+                return view('OfficeExpense.index', compact('expenseCategories', 'expenseHeads', 'fundCategories'));
+            } else {
+                return redirect('/')->with('error', 'You do not have permission to view this page.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
+        
+        
     }
 
 
@@ -31,30 +48,24 @@ class OfficeExpenseController extends Controller
 
 
 
-    public function create()
+    public function createPage()
     {
-        $expenseCategories = Expence::all();
-        $expenseHeads = ExpenseHead::all();
-        $fundCategories = FundCategory::all();
-        return view('OfficeExpense.create', compact('expenseCategories', 'expenseHeads', 'fundCategories'));
+        if (auth()->check()) {
+            if (auth()->user()->can('add_posts')) {
+                $expenseCategories = Expence::all();
+                $expenseHeads = ExpenseHead::all();
+                $fundCategories = FundCategory::all();
+                return view('OfficeExpense.create', compact('expenseCategories', 'expenseHeads', 'fundCategories'));
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to view this page.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function getFunds(Request $request)
     {
-        // $data = NewFund::all();
-        // return datatables()->of($data)
-        //     ->addColumn('action', function ($row) {
-
-        //         $btn = '<form action="' . route('funds.destroy', $row->id) . '" method="POST" style="display:inline-block;">
-        //                     ' . csrf_field() . '
-        //                     ' . method_field('DELETE') . '
-        //                     <button type="submit" class="delete btn btn-danger btn-sm">Delete</button>
-        //                  </form>';
-        //         return $btn;
-        //     })
-        //     ->rawColumns(['action'])
-        //     ->make(true);
-
 
         if ($request->ajax()) {
             $data = OfficeExpense::with('expenseCategory', 'expenseHeadCategory', 'fundCategory')->orderBy('created_at', 'desc')->get();
@@ -70,6 +81,7 @@ class OfficeExpenseController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     // $printUrl = route('officeExpense.print', $row->id);
+
                     $pdfUrl = route('officeExpense.pdf', $row->id);
                     $viewBtn = '<button data-id="' . $row->id . '" class="view btn btn-primary btn-sm">View</button>';
                     $pdfBtn = '<a href="' . $pdfUrl . '" class="btn btn-primary btn-sm mx-2" target="_blank">PDF</a>';
@@ -101,12 +113,12 @@ class OfficeExpenseController extends Controller
         }
     }
 
-    public function distroy($id)
-    {
-        $fund = OfficeExpense::find($id);
-        $fund->delete();
-        return redirect()->route('officeExpense.index')->with('success', 'Expense head added sucessfully.');
-    }
+    // public function distroy($id)
+    // {
+    //     $fund = OfficeExpense::find($id);
+    //     $fund->delete();
+    //     return redirect()->route('officeExpense.index')->with('success', 'Expense head added sucessfully.');
+    // }
 
     public function store(Request $request)
     {
@@ -121,12 +133,12 @@ class OfficeExpenseController extends Controller
             // dd($fundCategory->total);
             if ($fundCategory->total < $amounts[$key]) {
                 return redirect()->route('officeExpense.index')->with('error', 'Not enough funds in ' . $fundCategory->name);
-            }else{
-              $newTotal=  $fundCategory->total-$amounts[$key];
-              $newExpensedAmount=  $fundCategory->expensedAmount+$amounts[$key];
+            } else {
+                $newTotal =  $fundCategory->total - $amounts[$key];
+                $newExpensedAmount =  $fundCategory->expensedAmount + $amounts[$key];
                 $fundCategory->update([
                     'total' => $newTotal,
-                    'expensedAmount' =>$newExpensedAmount
+                    'expensedAmount' => $newExpensedAmount
                 ]);
             }
         }
@@ -143,7 +155,7 @@ class OfficeExpenseController extends Controller
             'amount' => $totalAmount,
         ]);
 
-        
+
         foreach ($request->input('expense_category') as $key => $category) {
             // dd($expenseMaster->id);
             OfficeExpense::create([
@@ -160,28 +172,50 @@ class OfficeExpenseController extends Controller
 
     public function print($id)
     {
-        $officeExpense = OfficeExpense::findOrFail($id);
-        return view('officeExpense.print', compact('officeExpense'));
+        if (auth()->check()) {
+            if (auth()->user()->can('expense-print')) {
+
+                $officeExpense = OfficeExpense::findOrFail($id);
+                return view('officeExpense.print', compact('officeExpense'));
+
+
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to print.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
+
     }
 
     public function pdf($id)
     {
-       $officeExpense = OfficeExpense::with('expenseCategory', 'expenseHeadCategory', 'fundCategory')->find($id);
-        if (!$officeExpense) {
-            return redirect()->route('officeExpense.index')->with('error', 'Expense not found');
+        if (auth()->check()) {
+            if (auth()->user()->can('expense-pdf')) {
+               
+                $officeExpense = OfficeExpense::with('expenseCategory', 'expenseHeadCategory', 'fundCategory')->find($id);
+                if (!$officeExpense) {
+                    return redirect()->route('officeExpense.index')->with('error', 'Expense not found');
+                }
+
+                $data = [
+                    'id' => $officeExpense->id,
+                    'expenseCategory' => $officeExpense->expenseCategory ? $officeExpense->expenseCategory->name : 'N/A',
+                    'expenseHeadCategory' => $officeExpense->expenseHeadCategory ? $officeExpense->expenseHeadCategory->name : 'N/A',
+                    'fundCategory' => $officeExpense->fundCategory ? $officeExpense->fundCategory->name : 'N/A',
+                    'description' => $officeExpense->description,
+                    'amount' => $officeExpense->amount,
+                    'date' => $officeExpense->created_at->format('Y-m-d')
+                ];
+
+                $pdf =  \PDF::loadView('officeExpense.pdf', $data);
+                return $pdf->download('expense_' . $id . '.pdf');
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to pdf download.');
+            }
+
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
         }
-
-        $data = [
-            'id' => $officeExpense->id,
-            'expenseCategory' => $officeExpense->expenseCategory ? $officeExpense->expenseCategory->name : 'N/A',
-            'expenseHeadCategory' => $officeExpense->expenseHeadCategory ? $officeExpense->expenseHeadCategory->name : 'N/A',
-            'fundCategory' => $officeExpense->fundCategory ? $officeExpense->fundCategory->name : 'N/A',
-            'description' => $officeExpense->description,
-            'amount' => $officeExpense->amount,
-            'date'=> $officeExpense->created_at->format('Y-m-d')
-        ];
-
-        $pdf =  \PDF::loadView('officeExpense.pdf', $data);
-        return $pdf->download('expense_' . $id . '.pdf');
     }
 }

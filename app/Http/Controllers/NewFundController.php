@@ -13,32 +13,35 @@ class NewFundController extends Controller
 {
     public function createPage()
     {
-        $funds = FundCategory::all();
-        return view('fund.createFund', compact('funds'));
+        
+        if (auth()->check()) {
+            if (auth()->user()->can('add-fundAdjustment')) {
+                $funds = FundCategory::all();
+                return view('fund.createFund', compact('funds'));
+            } else {
+                return redirect('/')->with('error', 'You do not have permission to view this page.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function index()
     {
-        $funds = NewFund::with('category')->get();
-        return view('fund.index', compact('funds'));
+        if (auth()->check()) {
+            if (auth()->user()->can('fund-category')) {
+                $funds = NewFund::with('category')->get();
+                return view('fund.index', compact('funds'));
+            } else {
+                return redirect('/')->with('error', 'You do not have permission to view this page.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function getFunds(Request $request)
     {
-        // $data = NewFund::all();
-        // return datatables()->of($data)
-        //     ->addColumn('action', function ($row) {
-
-        //         $btn = '<form action="' . route('funds.destroy', $row->id) . '" method="POST" style="display:inline-block;">
-        //                     ' . csrf_field() . '
-        //                     ' . method_field('DELETE') . '
-        //                     <button type="submit" class="delete btn btn-danger btn-sm">Delete</button>
-        //                  </form>';
-        //         return $btn;
-        //     })
-        //     ->rawColumns(['action'])
-        //     ->make(true);
-
 
         if ($request->ajax()) {
             $data = NewFund::with('category')->get();
@@ -46,17 +49,17 @@ class NewFundController extends Controller
                 ->addColumn('category_name', function ($row) {
                     return $row->category ? $row->category->name : '';
                 })
-                 ->addColumn('action', function ($row) {
+                ->addColumn('action', function ($row) {
 
-                $btn = '<form action="' . route('funds.destroy', $row->id) . '" method="POST" style="display:inline-block;">
+                    $btn = '<form action="' . route('funds.destroy', $row->id) . '" method="POST" style="display:inline-block;">
                             ' . csrf_field() . '
                             ' . method_field('DELETE') . '
                             <button type="submit" class="delete btn btn-danger btn-sm">Delete</button>
                          </form>';
-                return $btn;
-            })
-            ->rawColumns(['action'])
-            ->make(true);
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
         }
     }
 
@@ -68,12 +71,12 @@ class NewFundController extends Controller
             NewFund::create($request->all());
 
             $fundCategory = FundCategory::find($request->category_id);
-            $newAmount = $fundCategory->addedFundAmount	 + $request->amount;
+            $newAmount = $fundCategory->addedFundAmount     + $request->amount;
             $newTotalAmount = $fundCategory->total + $request->amount;
-
+            
             $fundCategory->update([
                 'addedFundAmount' => $newAmount,
-                'total'=>$newTotalAmount
+                'total' => $newTotalAmount
             ]);
             DB::commit();
             return redirect()->route('fund.index')->with('success', 'Expense head added sucessfully.');
@@ -81,14 +84,5 @@ class NewFundController extends Controller
             DB::rollBack();
             return $e->getMessage();
         }
-    }
-
-
-
-    public function destroy($id)
-    {
-        $fund = NewFund::find($id);
-        $fund->delete();
-        return redirect()->route('fund.index')->with('success', 'Expense head added sucessfully.');
     }
 }

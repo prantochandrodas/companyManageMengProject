@@ -49,16 +49,19 @@
 
                 {{-- excel download button  --}}
 
-
-                <a href="{{ route('ledger.export', ['fromDate' => request('fromDate'), 'toDate' => request('toDate'),'hi' =>'helo']) }}"
+                @can('ledger-excel')
+                <a href="{{ route('ledger.export', ['fromDate' => request('fromDate'), 'toDate' => request('toDate'), 'hi' => 'helo']) }}"
                     class="btn btn-primary btn-small mb-2">Download Excel</a>
-
+                @endcan
                 {{-- pdf download btn  --}}
+                @can('ledger-pdf')
                 <a href="{{ route('ledger.pdf', ['fromDate' => request('fromDate'), 'toDate' => request('toDate')]) }}"
                     class="btn btn-primary btn-small mb-2 mx-2">PDF</a>
-
+                @endcan
+                
+                @can('ledger-pdf')
                 <a href=""><button type="submit" class="btn btn-success btn-small print">Print</button></a>
-
+                @endcan
             </div>
             <table class="table table-bordered">
                 <thead>
@@ -81,8 +84,9 @@
                             @php
                                 $totalDebit = 0; // Initialize total debit variable
                                 $totalCrebit = 0; // Initialize total debit variable
-                                $totalBalanceebit = 0; // Initialize total debit variable
+                                $totalBalance = $setOpeningAmount;
                             @endphp
+                            {{-- <p>{{$totalBalance}}</p> --}}
                             @foreach ($ledgerEntries as $entry)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
@@ -92,32 +96,38 @@
                                     <td>{{ number_format($entry->debit) }}</td>
                                     <td>{{ number_format($entry->credit) }}</td>
                                     <td>{{ number_format($entry->balance) }}</td>
+
+                                    @php
+                                        $totalDebit += $entry->debit; // Add debit amount to total
+                                        $totalCrebit += $entry->credit;
+
+                                        $totalBalance += $entry->debit -$entry->credit;
+                                    @endphp
                                 </tr>
-                                @php
-                                    $totalDebit += $entry->debit; // Add debit amount to total
-                                    $totalCrebit += $entry->credit; // Add debit amount to total
-                                    $totalBalanceebit += $entry->balance; // Add debit amount to total
-                                @endphp
                             @endforeach
                             <tr>
                                 <td>
-                                   {{count($ledgerEntries) + 1}}
+                                    {{ count($ledgerEntries) + 1 }}
                                 </td>
                                 <td colspan="3">Total</td>
                                 <td>{{ $totalDebit }}</td>
                                 <td>{{ $totalCrebit }}</td>
-                                <td>{{ $totalBalanceebit }}</td>
+                                <td>{{ $totalBalance }}</td>
                             </tr>
                             <tr>
                                 <td>
-                                   {{count($ledgerEntries) + 2}}
+                                    {{ count($ledgerEntries) + 2 }}
                                 </td>
                                 <td colspan="3">Summary</td>
                                 <td colspan="3">
-                                    <span style="font-weight:600; font-size:15px">Opening Balance :</span> {{ $ledgerEntries[0]->balance }} <br>
-                                    <span style="font-weight:600; font-size:15px">Total Debit :</span> {{ $totalDebit }} <br>
-                                    <span style="font-weight:600; font-size:15px">Total credit :</span> {{ $totalCrebit }} <br>
-                                    <span style="font-weight:600; font-size:15px">Final Balance :</span> {{ $totalBalanceebit }}
+                                    <span style="font-weight:600; font-size:15px">Opening Balance :</span>
+                                    {{ $setOpeningAmount }} <br>
+                                    <span style="font-weight:600; font-size:15px">Total Debit :</span> {{ $totalDebit }}
+                                    <br>
+                                    <span style="font-weight:600; font-size:15px">Total credit :</span> {{ $totalCrebit }}
+                                    <br>
+                                    <span style="font-weight:600; font-size:15px">Final Balance :</span>
+                                    {{ $totalBalance }}
                                 </td>
                             </tr>
                         </tbody>

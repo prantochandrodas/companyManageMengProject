@@ -9,12 +9,30 @@ class IncomeCategoryController extends Controller
 {
     public function index()
     {
-        return view('IncomeCategory.index');
+        if (auth()->check()) {
+            if (auth()->user()->can('income-category')) {
+                return view('IncomeCategory.index');
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to
+             Income category.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function create()
     {
-        return view('IncomeCategory.create');
+        if (auth()->check()) {
+            if (auth()->user()->can('add-incomeCategory')) {
+                return view('IncomeCategory.create');
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to
+             Income category.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function store(Request $request)
@@ -52,9 +70,21 @@ class IncomeCategoryController extends Controller
         }
     }
 
-    public function distroy($id){
-        $income=IncomeCategory::find($id);
-        $income->delete();
-        return redirect()->route('incomeCategory.index')->with('success','Deleted successful');
+    public function distroy($id)
+    {
+        $income = IncomeCategory::find($id);
+
+
+        if (auth()->check()) {
+            if (auth()->user()->can('delete_posts')) {
+                $income->delete();
+                return redirect()->route('incomeCategory.index')->with('success', 'Deleted successful');
+            } else {
+                return redirect()->back()->with('error', 'You do not have permission to
+                delete Income category.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 }

@@ -7,14 +7,30 @@ use App\Models\FundCategory;
 use App\Models\Income;
 use App\Models\NewFund;
 use App\Models\OfficeExpense;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
+use PHPUnit\TextUI\Configuration\Php;
 use Yajra\DataTables\Facades\DataTables;
 
 class FundCategoryController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('permission:Fund-Add', ['only' => ['create']]);
+    }
+
     public function index()
     {
-        return view('FundCategory.index');
+        if (auth()->check()) {
+            if (auth()->user()->can('fund-category')) {
+                return view('FundCategory.index');
+            } else {
+                return redirect()->route('login')->with('error', 'You do not have permission to view this page.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
 
@@ -30,7 +46,15 @@ class FundCategoryController extends Controller
 
     public function createPage()
     {
-        return view('FundCategory.createpage');
+        if (auth()->check()) {
+            if (auth()->user()->can('add-fund')) {
+                return view('FundCategory.createpage');
+            } else {
+                return redirect('/')->with('error', 'You do not have permission to add fund.');
+            }
+        } else {
+            return redirect()->route('login')->with('error', 'You need to login first.');
+        }
     }
 
     public function store(Request $request)
@@ -56,9 +80,15 @@ class FundCategoryController extends Controller
             $fundadded->amount = $validateData['openingAmount'];
             $fundadded->save();
             // FundCategory::create($request->all());
-            return redirect()->route('fundsCategory.index')->with('success', 'Funds category added sucessfully');
+            // return redirect()->route('fundsCategory.index')->with('success', 'Funds category added sucessfully');
+            return response()->json([
+                'message'=>'Fundcategory added successfully',
+                'fundcategory'=>$fundCategory,
+            ],200);
         } else {
-            return redirect()->route('fundsCategory.index')->with('error', 'Already exist');
+            return response()->json([
+                'message' => 'Funds category already exists',
+            ], 409);
         }
     }
 }
